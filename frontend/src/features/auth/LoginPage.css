@@ -1,0 +1,87 @@
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(160deg, #eff6ff 0%, #f8fafc 60%);
+  padding: 20px;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 380px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  padding: 32px 28px;
+}
+
+.login-card__brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 28px;
+}
+
+.login-card__brand-mark {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  background: var(--color-primary);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}
+
+.login-card__brand-title {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.login-card__brand-subtitle {
+  font-size: 11.5px;
+  color: var(--text-muted);
+}
+
+.login-card__heading {
+  font-size: 22px;
+  margin-bottom: 4px;
+}
+
+.login-card__hint {
+  font-size: 13.5px;
+  color: var(--text-secondary);
+  margin-bottom: 22px;
+}
+
+.login-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.login-field input {
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  font-size: 14px;
+  outline: none;
+}
+
+.login-field input:focus {
+  border-color: var(--color-primary);
+}
+
+.login-card__submit {
+  width: 100%;
+  justify-content: center;
+  margin-top: 6px;
+  padding: 11px 16px;
+}
