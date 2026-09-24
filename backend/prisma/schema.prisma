@@ -1,0 +1,116 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum SystemRole {
+  admin
+  librarian
+}
+
+enum ContractStatus {
+  active
+  expiring
+  expired
+  liquidated
+}
+
+enum ReaderStatus {
+  active
+  locked
+  expired
+}
+
+enum BookStatus {
+  available
+  borrowed_out
+  liquidated
+}
+
+enum LoanStatus {
+  borrowing
+  returned
+  overdue
+}
+
+model SystemUser {
+  id           String     @id @default(cuid())
+  fullName     String
+  email        String     @unique
+  passwordHash String
+  role         SystemRole @default(librarian)
+  active       Boolean    @default(true)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@map("system_users")
+}
+
+model SupplierContract {
+  id           String         @id @default(cuid())
+  code         String         @unique
+  title        String
+  supplierName String
+  type         String
+  value        Decimal        @db.Decimal(14, 2)
+  signedDate   DateTime
+  expiryDate   DateTime
+  status       ContractStatus @default(active)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  @@map("supplier_contracts")
+}
+
+model Reader {
+  id             String       @id @default(cuid())
+  code           String       @unique
+  fullName       String
+  email          String       @unique
+  phone          String
+  cardExpiry     DateTime
+  status         ReaderStatus @default(active)
+  loans          LoanSlip[]
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@map("readers")
+}
+
+model Book {
+  id        String     @id @default(cuid())
+  code      String     @unique
+  title     String
+  author    String
+  publisher String
+  category  String
+  quantity  Int        @default(0)
+  available Int        @default(0)
+  status    BookStatus @default(available)
+  loans     LoanSlip[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  @@map("books")
+}
+
+model LoanSlip {
+  id         String     @id @default(cuid())
+  code       String     @unique
+  readerId   String
+  reader     Reader     @relation(fields: [readerId], references: [id])
+  bookId     String
+  book       Book       @relation(fields: [bookId], references: [id])
+  borrowDate DateTime
+  dueDate    DateTime
+  returnDate DateTime?
+  status     LoanStatus @default(borrowing)
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+
+  @@map("loan_slips")
+}
