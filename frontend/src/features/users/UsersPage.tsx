@@ -106,9 +106,18 @@ export default function UsersPage() {
         {error && <p className="table-card__error">{error}</p>}
         <DataTable
           columns={[
-            { key: 'name', header: 'Họ tên', render: (u) => u.fullName },
-            { key: 'email', header: 'Email', render: (u) => u.email },
-            { key: 'role', header: 'Vai trò', render: (u) => roleLabel[u.role] },
+            { key: 'name', header: 'Họ tên', render: (u) => <span className="cell-primary">{u.fullName}</span> },
+            { key: 'email', header: 'Email', render: (u) => <span className="cell-muted">{u.email}</span> },
+            {
+              key: 'role',
+              header: 'Vai trò',
+              render: (u) =>
+                u.role === 'admin' ? (
+                  <StatusBadge label={roleLabel[u.role]} tone="primary" />
+                ) : (
+                  <StatusBadge label={roleLabel[u.role]} tone="neutral" />
+                ),
+            },
             {
               key: 'status',
               header: 'Trạng thái',
@@ -144,6 +153,11 @@ export default function UsersPage() {
           getRowId={(u) => u.id}
           emptyText={loading ? 'Đang tải dữ liệu...' : 'Không tìm thấy người dùng phù hợp'}
         />
+        {!loading && (
+          <div className="table-card__footer">
+            Hiển thị {filtered.length} / {users.length} tài khoản
+          </div>
+        )}
       </div>
 
       {modalOpen && <UserFormModal initial={editing} onClose={() => setModalOpen(false)} onSubmit={handleSubmit} />}

@@ -3,7 +3,7 @@ import { z } from 'zod'
 export const bookStatusEnum = z.enum(['available', 'borrowed_out', 'liquidated'])
 
 export const createBookSchema = z.object({
-  code: z.string().min(1),
+  code: z.string().min(1).optional(),
   title: z.string().min(1),
   author: z.string().min(1),
   publisher: z.string().min(1),

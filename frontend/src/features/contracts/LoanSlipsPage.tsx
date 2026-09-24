@@ -16,7 +16,7 @@ import {
 } from '../../services/loansApi'
 import { extractErrorMessage } from '../../services/api'
 import { loanStatusMap } from '../../constants/statusMaps'
-import { formatDate } from '../../utils/format'
+import { formatDate, daysUntil } from '../../utils/format'
 import type { LoanStatus } from '../../types'
 
 export default function LoanSlipsPage() {
@@ -97,12 +97,36 @@ export default function LoanSlipsPage() {
         {error && <p className="table-card__error">{error}</p>}
         <DataTable
           columns={[
-            { key: 'code', header: 'Mã phiếu', render: (l) => <strong>{l.code}</strong> },
-            { key: 'reader', header: 'Độc giả', render: (l) => l.reader.fullName },
+            { key: 'code', header: 'Mã phiếu', render: (l) => <span className="cell-code">{l.code}</span> },
+            {
+              key: 'reader',
+              header: 'Độc giả',
+              render: (l) => (
+                <div className="cell-stack">
+                  <span className="cell-primary">{l.reader.fullName}</span>
+                  <small className="cell-hint">{l.reader.code}</small>
+                </div>
+              ),
+            },
             { key: 'book', header: 'Sách', render: (l) => l.book.title },
             { key: 'borrow', header: 'Ngày mượn', render: (l) => formatDate(l.borrowDate) },
-            { key: 'due', header: 'Hạn trả', render: (l) => formatDate(l.dueDate) },
-            { key: 'return', header: 'Ngày trả', render: (l) => (l.returnDate ? formatDate(l.returnDate) : '—') },
+            {
+              key: 'due',
+              header: 'Hạn trả',
+              render: (l) => (
+                <div className="cell-stack">
+                  <span>{formatDate(l.dueDate)}</span>
+                  {l.status === 'overdue' && (
+                    <small className="cell-hint cell-hint--danger">trễ {Math.abs(daysUntil(l.dueDate))} ngày</small>
+                  )}
+                </div>
+              ),
+            },
+            {
+              key: 'return',
+              header: 'Ngày trả',
+              render: (l) => (l.returnDate ? formatDate(l.returnDate) : <span className="cell-muted">—</span>),
+            },
             {
               key: 'status',
               header: 'Trạng thái',
@@ -129,6 +153,11 @@ export default function LoanSlipsPage() {
           getRowId={(l) => l.id}
           emptyText={loading ? 'Đang tải dữ liệu...' : 'Không tìm thấy phiếu mượn phù hợp'}
         />
+        {!loading && (
+          <div className="table-card__footer">
+            Hiển thị {filtered.length} / {loans.length} phiếu mượn
+          </div>
+        )}
       </div>
 
       {modalOpen && <LoanFormModal onClose={() => setModalOpen(false)} onSubmit={handleCreate} />}

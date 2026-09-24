@@ -11,6 +11,14 @@
 }
 
 .main-layout__body {
-  padding: 24px 28px 40px;
+  padding: 26px 28px 48px;
   flex: 1;
+  max-width: 1600px;
+  width: 100%;
+}
+
+@media (max-width: 720px) {
+  .main-layout__body {
+    padding: 20px 16px 36px;
+  }
 }

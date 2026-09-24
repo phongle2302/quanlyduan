@@ -11,20 +11,31 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 16px 20px;
+  padding: 16px 18px;
   border-bottom: 1px solid var(--border);
   flex-wrap: wrap;
+}
+
+.table-card__toolbar h3 {
+  font-size: 15px;
 }
 
 .table-card__search {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: var(--bg-app);
+  background: var(--bg-subtle);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   padding: 8px 12px;
-  min-width: 260px;
+  min-width: 280px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.table-card__search:focus-within {
+  background: var(--bg-surface);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
 .table-card__search input {
@@ -45,6 +56,7 @@
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
+  align-items: center;
 }
 
 .table-card__filters select {
@@ -54,13 +66,27 @@
   font-size: 14px;
   color: var(--text-primary);
   background: var(--bg-surface);
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.table-card__filters select:focus {
+  border-color: var(--color-primary);
 }
 
 .table-card__error {
   margin: 0;
-  padding: 12px 20px;
+  padding: 12px 18px;
   background: var(--color-danger-bg);
   color: var(--color-danger);
   font-size: 13.5px;
   border-bottom: 1px solid var(--border);
+}
+
+.table-card__footer {
+  padding: 11px 18px;
+  border-top: 1px solid var(--border);
+  background: var(--bg-subtle);
+  font-size: 12.5px;
+  color: var(--text-secondary);
 }

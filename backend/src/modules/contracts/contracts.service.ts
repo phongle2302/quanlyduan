@@ -1,5 +1,6 @@
 import { prisma } from '../../config/prisma'
 import { ApiError } from '../../common/ApiError'
+import { nextContractCode } from '../../common/codeGenerator'
 import type { CreateContractInput, UpdateContractInput } from './contracts.schema'
 
 export function listContracts(search?: string, status?: string) {
@@ -28,8 +29,9 @@ export async function getContract(id: string) {
   return contract
 }
 
-export function createContract(data: CreateContractInput) {
-  return prisma.supplierContract.create({ data })
+export async function createContract(data: CreateContractInput) {
+  const code = data.code ?? (await nextContractCode())
+  return prisma.supplierContract.create({ data: { ...data, code } })
 }
 
 export async function updateContract(id: string, data: UpdateContractInput) {

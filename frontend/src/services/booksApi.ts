@@ -5,7 +5,7 @@ export function fetchBooks(params?: { search?: string; status?: string }) {
   return api.get<BookRecord[]>('/books', { params }).then((res) => res.data)
 }
 
-export type BookPayload = Omit<BookRecord, 'id'>
+export type BookPayload = Omit<BookRecord, 'id' | 'code'> & { code?: string }
 
 export function createBook(payload: BookPayload) {
   return api.post<BookRecord>('/books', payload).then((res) => res.data)

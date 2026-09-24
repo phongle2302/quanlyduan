@@ -11,7 +11,6 @@ interface BookFormModalProps {
 }
 
 export default function BookFormModal({ initial, onClose, onSubmit }: BookFormModalProps) {
-  const [code, setCode] = useState(initial?.code ?? '')
   const [title, setTitle] = useState(initial?.title ?? '')
   const [author, setAuthor] = useState(initial?.author ?? '')
   const [publisher, setPublisher] = useState(initial?.publisher ?? '')
@@ -28,7 +27,7 @@ export default function BookFormModal({ initial, onClose, onSubmit }: BookFormMo
     setSaving(true)
     try {
       await onSubmit({
-        code,
+        code: initial?.code,
         title,
         author,
         publisher,
@@ -49,10 +48,14 @@ export default function BookFormModal({ initial, onClose, onSubmit }: BookFormMo
       <form onSubmit={handleSubmit}>
         {error && <p className="form-error">{error}</p>}
 
-        <label className="form-field">
-          <span>Mã sách</span>
-          <input value={code} onChange={(e) => setCode(e.target.value)} required />
-        </label>
+        {initial ? (
+          <label className="form-field">
+            <span>Mã sách</span>
+            <input value={initial.code} disabled />
+          </label>
+        ) : (
+          <p className="form-note">Mã sách sẽ được hệ thống tự sinh khi lưu.</p>
+        )}
 
         <label className="form-field">
           <span>Tên sách</span>

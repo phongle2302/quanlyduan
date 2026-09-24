@@ -15,7 +15,6 @@ function toDateInput(value?: string) {
 }
 
 export default function ContractFormModal({ initial, onClose, onSubmit }: ContractFormModalProps) {
-  const [code, setCode] = useState(initial?.code ?? '')
   const [title, setTitle] = useState(initial?.title ?? '')
   const [supplierName, setSupplierName] = useState(initial?.supplierName ?? '')
   const [type, setType] = useState(initial?.type ?? '')
@@ -32,7 +31,7 @@ export default function ContractFormModal({ initial, onClose, onSubmit }: Contra
     setSaving(true)
     try {
       await onSubmit({
-        code,
+        code: initial?.code,
         title,
         supplierName,
         type,
@@ -53,10 +52,14 @@ export default function ContractFormModal({ initial, onClose, onSubmit }: Contra
       <form onSubmit={handleSubmit}>
         {error && <p className="form-error">{error}</p>}
 
-        <label className="form-field">
-          <span>Mã hợp đồng</span>
-          <input value={code} onChange={(e) => setCode(e.target.value)} required />
-        </label>
+        {initial ? (
+          <label className="form-field">
+            <span>Mã hợp đồng</span>
+            <input value={initial.code} disabled />
+          </label>
+        ) : (
+          <p className="form-note">Mã hợp đồng sẽ được hệ thống tự sinh khi lưu.</p>
+        )}
 
         <label className="form-field">
           <span>Nội dung</span>

@@ -5,7 +5,7 @@ export function fetchContracts(params?: { search?: string; status?: string }) {
   return api.get<SupplierContract[]>('/contracts', { params }).then((res) => res.data)
 }
 
-export type ContractPayload = Omit<SupplierContract, 'id'>
+export type ContractPayload = Omit<SupplierContract, 'id' | 'code'> & { code?: string }
 
 export function createContract(payload: ContractPayload) {
   return api.post<SupplierContract>('/contracts', payload).then((res) => res.data)

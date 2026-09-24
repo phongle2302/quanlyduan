@@ -8,31 +8,84 @@
 
 .data-table thead th {
   text-align: left;
-  font-size: 12px;
+  font-size: 11.5px;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.05em;
   color: var(--text-muted);
-  padding: 10px 16px;
+  padding: 11px 18px;
+  background: var(--bg-subtle);
   border-bottom: 1px solid var(--border);
   white-space: nowrap;
+  position: sticky;
+  top: 0;
 }
 
 .data-table tbody td {
-  padding: 12px 16px;
+  padding: 13px 18px;
   border-bottom: 1px solid var(--border);
   color: var(--text-primary);
+  vertical-align: middle;
 }
 
 .data-table tbody tr:last-child td {
   border-bottom: none;
 }
 
+.data-table tbody tr {
+  transition: background 0.12s ease;
+}
+
 .data-table tbody tr:hover {
-  background: var(--bg-app);
+  background: var(--bg-subtle);
 }
 
 .data-table__empty {
   text-align: center;
   color: var(--text-muted);
-  padding: 32px 16px !important;
+  padding: 40px 18px !important;
+  font-size: 13.5px;
+}
+
+/* Mã đối tượng: luôn nằm gọn trên một dòng, dễ quét mắt */
+.cell-code {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--color-primary);
+  background: var(--color-primary-bg);
+  border-radius: var(--radius-sm);
+  padding: 3px 8px;
+  white-space: nowrap;
+}
+
+.cell-primary {
+  font-weight: 500;
+}
+
+.cell-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  align-items: inherit;
+}
+
+.cell-hint {
+  font-size: 11.5px;
+  color: var(--text-muted);
+}
+
+.cell-hint--danger {
+  color: var(--color-danger);
+  font-weight: 500;
+}
+
+.cell-muted {
+  color: var(--text-muted);
+}
+
+.cell-number {
+  font-variant-numeric: tabular-nums;
 }

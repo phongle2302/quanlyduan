@@ -39,10 +39,14 @@ npm run prisma:seed       # tạo dữ liệu mẫu + tài khoản đăng nhập
 npm run dev                # chạy server tại http://localhost:4000
 ```
 
+Lệnh seed sẽ **xóa sạch dữ liệu cũ** rồi tạo lại bộ dữ liệu mẫu đầy đủ: 3 tài khoản, 10 hợp đồng, 15 độc giả, 20 đầu sách và 18 phiếu mượn/trả (ngày tháng tính theo thời điểm chạy nên luôn có hợp đồng sắp hết hạn và phiếu quá hạn thực tế).
+
 Tài khoản sau khi seed:
-- `admin` / `admin` — quản trị viên, toàn quyền (dùng để đăng nhập nhanh khi test).
-- `hoa.pham@thuvien.edu.vn` / `123456` — quản trị viên mẫu.
-- `long.nguyen@thuvien.edu.vn` / `123456` — thủ thư mẫu (không có quyền quản lý người dùng, không xóa được hợp đồng/độc giả/sách).
+- `admin` / `admin` — quản trị viên, toàn quyền.
+- `lananh.nguyen@thuvien.edu.vn` / `123456` — thủ thư.
+- `quocbao.tran@thuvien.edu.vn` / `123456` — thủ thư (không quản lý được người dùng, không xóa được hợp đồng/độc giả/sách).
+
+Mã của hợp đồng, độc giả, sách và phiếu mượn được **backend tự sinh tăng dần** (`HD-2026-001`, `DG-00001`, `S-00001`, `PM-000001`), không cần nhập tay khi thêm mới.
 
 ## Quy ước
 

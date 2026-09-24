@@ -76,6 +76,8 @@ export default function Sidebar() {
           </div>
         ))}
       </nav>
+
+      <div className="sidebar__footer">Phiên bản 1.0 · Thư viện Số</div>
     </aside>
   )
 }

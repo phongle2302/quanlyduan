@@ -111,13 +111,27 @@ export default function BooksPage() {
         {error && <p className="table-card__error">{error}</p>}
         <DataTable
           columns={[
-            { key: 'code', header: 'Mã sách', render: (b) => <strong>{b.code}</strong> },
-            { key: 'title', header: 'Tên sách', render: (b) => b.title },
+            { key: 'code', header: 'Mã sách', render: (b) => <span className="cell-code">{b.code}</span> },
+            { key: 'title', header: 'Tên sách', render: (b) => <span className="cell-primary">{b.title}</span> },
             { key: 'author', header: 'Tác giả', render: (b) => b.author },
-            { key: 'publisher', header: 'Nhà xuất bản', render: (b) => b.publisher },
+            { key: 'publisher', header: 'Nhà xuất bản', render: (b) => <span className="cell-muted">{b.publisher}</span> },
             { key: 'category', header: 'Thể loại', render: (b) => b.category },
-            { key: 'quantity', header: 'Tổng số', align: 'center', render: (b) => b.quantity },
-            { key: 'available', header: 'Còn lại', align: 'center', render: (b) => b.available },
+            {
+              key: 'quantity',
+              header: 'Tổng số',
+              align: 'center',
+              render: (b) => <span className="cell-number">{b.quantity}</span>,
+            },
+            {
+              key: 'available',
+              header: 'Còn lại',
+              align: 'center',
+              render: (b) => (
+                <span className={b.available === 0 ? 'cell-number cell-hint--danger' : 'cell-number'}>
+                  {b.available}
+                </span>
+              ),
+            },
             {
               key: 'status',
               header: 'Trạng thái',
@@ -146,6 +160,11 @@ export default function BooksPage() {
           getRowId={(b) => b.id}
           emptyText={loading ? 'Đang tải dữ liệu...' : 'Không tìm thấy sách phù hợp'}
         />
+        {!loading && (
+          <div className="table-card__footer">
+            Hiển thị {filtered.length} / {books.length} đầu sách
+          </div>
+        )}
       </div>
 
       {modalOpen && <BookFormModal initial={editing} onClose={() => setModalOpen(false)} onSubmit={handleSubmit} />}

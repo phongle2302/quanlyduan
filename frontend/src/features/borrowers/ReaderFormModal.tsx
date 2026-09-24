@@ -11,7 +11,6 @@ interface ReaderFormModalProps {
 }
 
 export default function ReaderFormModal({ initial, onClose, onSubmit }: ReaderFormModalProps) {
-  const [code, setCode] = useState(initial?.code ?? '')
   const [fullName, setFullName] = useState(initial?.fullName ?? '')
   const [email, setEmail] = useState(initial?.email ?? '')
   const [phone, setPhone] = useState(initial?.phone ?? '')
@@ -25,7 +24,7 @@ export default function ReaderFormModal({ initial, onClose, onSubmit }: ReaderFo
     setError('')
     setSaving(true)
     try {
-      await onSubmit({ code, fullName, email, phone, cardExpiry, status })
+      await onSubmit({ code: initial?.code, fullName, email, phone, cardExpiry, status })
     } catch (err) {
       setError((err as Error).message)
     } finally {
@@ -38,10 +37,14 @@ export default function ReaderFormModal({ initial, onClose, onSubmit }: ReaderFo
       <form onSubmit={handleSubmit}>
         {error && <p className="form-error">{error}</p>}
 
-        <label className="form-field">
-          <span>Mã thẻ</span>
-          <input value={code} onChange={(e) => setCode(e.target.value)} required />
-        </label>
+        {initial ? (
+          <label className="form-field">
+            <span>Mã thẻ</span>
+            <input value={initial.code} disabled />
+          </label>
+        ) : (
+          <p className="form-note">Mã thẻ độc giả sẽ được hệ thống tự sinh khi lưu.</p>
+        )}
 
         <label className="form-field">
           <span>Họ tên</span>

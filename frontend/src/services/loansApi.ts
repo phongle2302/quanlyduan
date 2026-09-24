@@ -11,7 +11,6 @@ export function fetchLoans(params?: { search?: string; status?: string }) {
 }
 
 export interface CreateLoanPayload {
-  code: string
   readerId: string
   bookId: string
   borrowDate: string

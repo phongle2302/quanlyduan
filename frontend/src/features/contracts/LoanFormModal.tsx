@@ -11,12 +11,10 @@ interface LoanFormModalProps {
   onSubmit: (payload: CreateLoanPayload) => Promise<void>
 }
 
-function generateCode() {
-  return `PM-${Date.now().toString().slice(-8)}`
-}
-
-function todayInput() {
-  return new Date().toISOString().slice(0, 10)
+function dateInput(offsetDays = 0) {
+  const d = new Date()
+  d.setDate(d.getDate() + offsetDays)
+  return d.toISOString().slice(0, 10)
 }
 
 export default function LoanFormModal({ onClose, onSubmit }: LoanFormModalProps) {
@@ -24,8 +22,8 @@ export default function LoanFormModal({ onClose, onSubmit }: LoanFormModalProps)
   const [books, setBooks] = useState<BookRecord[]>([])
   const [readerId, setReaderId] = useState('')
   const [bookId, setBookId] = useState('')
-  const [borrowDate, setBorrowDate] = useState(todayInput())
-  const [dueDate, setDueDate] = useState('')
+  const [borrowDate, setBorrowDate] = useState(dateInput())
+  const [dueDate, setDueDate] = useState(dateInput(14))
   const [error, setError] = useState('')
   const [saving, setSaving] = useState(false)
   const [loadingOptions, setLoadingOptions] = useState(true)
@@ -49,7 +47,7 @@ export default function LoanFormModal({ onClose, onSubmit }: LoanFormModalProps)
     }
     setSaving(true)
     try {
-      await onSubmit({ code: generateCode(), readerId, bookId, borrowDate, dueDate })
+      await onSubmit({ readerId, bookId, borrowDate, dueDate })
     } catch (err) {
       setError((err as Error).message)
     } finally {

@@ -113,11 +113,16 @@ export default function SupplierContractsPage() {
         {error && <p className="table-card__error">{error}</p>}
         <DataTable
           columns={[
-            { key: 'code', header: 'Mã HĐ', render: (c) => <strong>{c.code}</strong> },
-            { key: 'title', header: 'Nội dung', render: (c) => c.title },
+            { key: 'code', header: 'Mã HĐ', render: (c) => <span className="cell-code">{c.code}</span> },
+            { key: 'title', header: 'Nội dung', render: (c) => <span className="cell-primary">{c.title}</span> },
             { key: 'supplier', header: 'Nhà cung cấp', render: (c) => c.supplierName },
-            { key: 'type', header: 'Loại', render: (c) => c.type },
-            { key: 'value', header: 'Giá trị', align: 'right', render: (c) => formatCurrency(c.value) },
+            { key: 'type', header: 'Loại', render: (c) => <span className="cell-muted">{c.type}</span> },
+            {
+              key: 'value',
+              header: 'Giá trị',
+              align: 'right',
+              render: (c) => <span className="cell-number">{formatCurrency(c.value)}</span>,
+            },
             { key: 'signed', header: 'Ngày ký', render: (c) => formatDate(c.signedDate) },
             { key: 'expiry', header: 'Ngày hết hạn', render: (c) => formatDate(c.expiryDate) },
             {
@@ -148,6 +153,11 @@ export default function SupplierContractsPage() {
           getRowId={(c) => c.id}
           emptyText={loading ? 'Đang tải dữ liệu...' : 'Không tìm thấy hợp đồng phù hợp'}
         />
+        {!loading && (
+          <div className="table-card__footer">
+            Hiển thị {filtered.length} / {contracts.length} hợp đồng
+          </div>
+        )}
       </div>
 
       {modalOpen && (

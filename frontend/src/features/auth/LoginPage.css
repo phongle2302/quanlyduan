@@ -3,94 +3,161 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(160deg, #eff6ff 0%, #f8fafc 60%);
-  padding: 20px;
+  padding: 24px;
+  background:
+    radial-gradient(900px 500px at 10% -10%, #dbeafe 0%, transparent 60%),
+    radial-gradient(700px 500px at 110% 110%, #e0e7ff 0%, transparent 55%),
+    var(--bg-app);
 }
 
-.login-card {
+.login-shell {
+  display: grid;
+  grid-template-columns: 1.05fr 1fr;
   width: 100%;
-  max-width: 380px;
+  max-width: 900px;
   background: var(--bg-surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-md);
-  padding: 32px 28px;
+  border-radius: 20px;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.12);
+  overflow: hidden;
 }
 
-.login-card__brand {
+/* ----- Panel minh họa ----- */
+
+.login-visual {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 36px 32px;
+  background: linear-gradient(155deg, #2563eb 0%, #1e40af 55%, #1e3a8a 100%);
+  color: #fff;
+}
+
+.login-visual__brand {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 28px;
+  gap: 12px;
 }
 
-.login-card__brand-mark {
-  width: 40px;
-  height: 40px;
-  border-radius: var(--radius-md);
-  background: var(--color-primary);
-  color: #fff;
+.login-visual__mark {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.25);
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 700;
+  font-size: 15px;
+  flex-shrink: 0;
 }
 
-.login-card__brand-title {
-  font-size: 14px;
+.login-visual__name {
+  font-size: 15px;
   font-weight: 600;
 }
 
-.login-card__brand-subtitle {
-  font-size: 11.5px;
-  color: var(--text-muted);
+.login-visual__tag {
+  font-size: 12px;
+  opacity: 0.75;
+  margin-top: 2px;
 }
 
-.login-card__heading {
-  font-size: 22px;
-  margin-bottom: 4px;
+.login-visual__art {
+  width: 100%;
+  max-width: 300px;
+  align-self: center;
 }
 
-.login-card__hint {
+.login-visual__caption {
   font-size: 13.5px;
-  color: var(--text-secondary);
-  margin-bottom: 22px;
+  line-height: 1.55;
+  opacity: 0.85;
 }
 
-.login-card__error {
+/* ----- Panel biểu mẫu ----- */
+
+.login-form-panel {
+  display: flex;
+  align-items: center;
+  padding: 40px 44px;
+}
+
+.login-form {
+  width: 100%;
+}
+
+.login-form__heading {
+  font-size: 26px;
+  margin-bottom: 26px;
+  color: var(--text-primary);
+}
+
+.login-form__error {
   background: var(--color-danger-bg);
   color: var(--color-danger);
   font-size: 13px;
-  padding: 8px 12px;
+  padding: 10px 12px;
   border-radius: var(--radius-md);
-  margin-bottom: 16px;
+  margin-bottom: 18px;
 }
 
 .login-field {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  margin-bottom: 16px;
+  gap: 7px;
+  margin-bottom: 18px;
   font-size: 13.5px;
   font-weight: 500;
   color: var(--text-primary);
 }
 
 .login-field input {
-  padding: 10px 12px;
+  padding: 11px 13px;
   border-radius: var(--radius-md);
   border: 1px solid var(--border);
-  font-size: 14px;
+  font-size: 14.5px;
   outline: none;
+  background: var(--bg-surface);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .login-field input:focus {
   border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
 }
 
-.login-card__submit {
+.login-form__submit {
   width: 100%;
   justify-content: center;
-  margin-top: 6px;
-  padding: 11px 16px;
+  margin-top: 8px;
+  padding: 12px 16px;
+  font-size: 14.5px;
+}
+
+@media (max-width: 760px) {
+  .login-shell {
+    grid-template-columns: 1fr;
+    max-width: 420px;
+  }
+
+  .login-visual {
+    padding: 26px 24px;
+    gap: 18px;
+  }
+
+  .login-visual__art {
+    max-width: 200px;
+  }
+
+  .login-visual__caption {
+    display: none;
+  }
+
+  .login-form-panel {
+    padding: 30px 26px;
+  }
 }

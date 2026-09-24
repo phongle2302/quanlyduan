@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 export const createLoanSchema = z.object({
-  code: z.string().min(1),
+  code: z.string().min(1).optional(),
   readerId: z.string().min(1),
   bookId: z.string().min(1),
   borrowDate: z.coerce.date(),

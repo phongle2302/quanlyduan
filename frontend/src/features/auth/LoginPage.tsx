@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Button from '../../components/common/Button'
+import BookIllustration from './BookIllustration'
 import { login } from '../../services/authApi'
 import { extractErrorMessage } from '../../services/api'
 import { saveSession } from '../../services/session'
@@ -30,46 +31,58 @@ export default function LoginPage() {
 
   return (
     <div className="login-page">
-      <form className="login-card" onSubmit={handleSubmit}>
-        <div className="login-card__brand">
-          <div className="login-card__brand-mark">TV</div>
-          <div>
-            <p className="login-card__brand-title">Thư viện Số</p>
-            <p className="login-card__brand-subtitle">Hệ thống Quản lý Hợp đồng / Hồ sơ</p>
+      <div className="login-shell">
+        <aside className="login-visual">
+          <div className="login-visual__brand">
+            <div className="login-visual__mark">TV</div>
+            <div>
+              <p className="login-visual__name">Thư viện Số</p>
+              <p className="login-visual__tag">Quản lý Hợp đồng &amp; Hồ sơ</p>
+            </div>
           </div>
-        </div>
 
-        <h1 className="login-card__heading">Đăng nhập</h1>
-        <p className="login-card__hint">Đăng nhập bằng tài khoản nhân viên/thủ thư được cấp.</p>
+          <BookIllustration />
 
-        {error && <p className="login-card__error">{error}</p>}
+          <p className="login-visual__caption">
+            Quản lý hợp đồng, phiếu mượn và hồ sơ thư viện trên một hệ thống duy nhất.
+          </p>
+        </aside>
 
-        <label className="login-field">
-          <span>Tài khoản</span>
-          <input
-            type="text"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="admin hoặc ten.nhanvien@thuvien.edu.vn"
-          />
-        </label>
+        <main className="login-form-panel">
+          <form className="login-form" onSubmit={handleSubmit}>
+            <h1 className="login-form__heading">Đăng nhập</h1>
 
-        <label className="login-field">
-          <span>Mật khẩu</span>
-          <input
-            type="password"
-            required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="••••••••"
-          />
-        </label>
+            {error && <p className="login-form__error">{error}</p>}
 
-        <Button type="submit" className="login-card__submit" disabled={loading}>
-          {loading ? 'Đang đăng nhập...' : 'Đăng nhập'}
-        </Button>
-      </form>
+            <label className="login-field">
+              <span>Email</span>
+              <input
+                type="text"
+                required
+                autoFocus
+                autoComplete="username"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </label>
+
+            <label className="login-field">
+              <span>Mật khẩu</span>
+              <input
+                type="password"
+                required
+                autoComplete="current-password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </label>
+
+            <Button type="submit" className="login-form__submit" disabled={loading}>
+              {loading ? 'Đang đăng nhập...' : 'Đăng nhập'}
+            </Button>
+          </form>
+        </main>
+      </div>
     </div>
   )
 }

@@ -3,7 +3,7 @@ import { z } from 'zod'
 export const contractStatusEnum = z.enum(['active', 'expiring', 'expired', 'liquidated'])
 
 export const createContractSchema = z.object({
-  code: z.string().min(1),
+  code: z.string().min(1).optional(),
   title: z.string().min(1),
   supplierName: z.string().min(1),
   type: z.string().min(1),

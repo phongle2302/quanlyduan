@@ -9,7 +9,9 @@ export interface DashboardSummary {
   activeReaders: number
   totalReaders: number
   totalBooks: number
+  availableBooks: number
   totalBookTitles: number
+  returnedThisMonth: number
 }
 
 export function fetchDashboardSummary() {

@@ -11,7 +11,7 @@ interface StatCardProps {
 
 export default function StatCard({ label, value, icon, tone = 'primary', hint }: StatCardProps) {
   return (
-    <div className="stat-card">
+    <div className={`stat-card stat-card--${tone}`}>
       <div className={`stat-card__icon stat-card__icon--${tone}`}>{icon}</div>
       <div className="stat-card__body">
         <p className="stat-card__label">{label}</p>

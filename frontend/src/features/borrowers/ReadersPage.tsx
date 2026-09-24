@@ -113,12 +113,17 @@ export default function ReadersPage() {
         {error && <p className="table-card__error">{error}</p>}
         <DataTable
           columns={[
-            { key: 'code', header: 'Mã thẻ', render: (r) => <strong>{r.code}</strong> },
-            { key: 'name', header: 'Họ tên', render: (r) => r.fullName },
-            { key: 'email', header: 'Email', render: (r) => r.email },
+            { key: 'code', header: 'Mã thẻ', render: (r) => <span className="cell-code">{r.code}</span> },
+            { key: 'name', header: 'Họ tên', render: (r) => <span className="cell-primary">{r.fullName}</span> },
+            { key: 'email', header: 'Email', render: (r) => <span className="cell-muted">{r.email}</span> },
             { key: 'phone', header: 'Điện thoại', render: (r) => r.phone },
             { key: 'expiry', header: 'Hạn thẻ', render: (r) => formatDate(r.cardExpiry) },
-            { key: 'borrowing', header: 'Đang mượn', align: 'center', render: (r) => r._count?.loans ?? 0 },
+            {
+              key: 'borrowing',
+              header: 'Đang mượn',
+              align: 'center',
+              render: (r) => <span className="cell-number">{r._count?.loans ?? 0}</span>,
+            },
             {
               key: 'status',
               header: 'Trạng thái',
@@ -147,6 +152,11 @@ export default function ReadersPage() {
           getRowId={(r) => r.id}
           emptyText={loading ? 'Đang tải dữ liệu...' : 'Không tìm thấy độc giả phù hợp'}
         />
+        {!loading && (
+          <div className="table-card__footer">
+            Hiển thị {filtered.length} / {readers.length} độc giả
+          </div>
+        )}
       </div>
 
       {modalOpen && <ReaderFormModal initial={editing} onClose={() => setModalOpen(false)} onSubmit={handleSubmit} />}

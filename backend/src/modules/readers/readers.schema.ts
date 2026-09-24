@@ -3,7 +3,7 @@ import { z } from 'zod'
 export const readerStatusEnum = z.enum(['active', 'locked', 'expired'])
 
 export const createReaderSchema = z.object({
-  code: z.string().min(1),
+  code: z.string().min(1).optional(),
   fullName: z.string().min(1),
   email: z.string().email(),
   phone: z.string().min(1),
