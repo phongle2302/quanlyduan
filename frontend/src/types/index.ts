@@ -17,8 +17,8 @@ export type LoanStatus = 'borrowing' | 'returned' | 'overdue'
 export interface LoanSlip {
   id: string
   code: string
-  readerName: string
-  bookTitle: string
+  readerId: string
+  bookId: string
   borrowDate: string
   dueDate: string
   returnDate: string | null
@@ -34,7 +34,6 @@ export interface Reader {
   email: string
   phone: string
   cardExpiry: string
-  borrowingCount: number
   status: ReaderStatus
 }
 

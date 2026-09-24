@@ -55,3 +55,12 @@
   color: var(--text-primary);
   background: var(--bg-surface);
 }
+
+.table-card__error {
+  margin: 0;
+  padding: 12px 20px;
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
+  font-size: 13.5px;
+  border-bottom: 1px solid var(--border);
+}

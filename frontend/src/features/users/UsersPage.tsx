@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import PageHeader from '../../components/common/PageHeader'
 import Button from '../../components/common/Button'
 import DataTable from '../../components/common/DataTable'
@@ -6,7 +6,9 @@ import StatusBadge from '../../components/common/StatusBadge'
 import TableToolbar from '../../components/common/TableToolbar'
 import { IconPlus } from '../../components/common/icons'
 import '../../components/common/TableCard.css'
-import { systemUsers } from '../../services/mockData'
+import { fetchUsers } from '../../services/usersApi'
+import { extractErrorMessage } from '../../services/api'
+import type { SystemUser } from '../../types'
 
 const roleLabel: Record<string, string> = {
   admin: 'Quản trị viên',
@@ -14,15 +16,26 @@ const roleLabel: Record<string, string> = {
 }
 
 export default function UsersPage() {
+  const [users, setUsers] = useState<SystemUser[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
   const [search, setSearch] = useState('')
 
+  useEffect(() => {
+    setLoading(true)
+    fetchUsers()
+      .then(setUsers)
+      .catch((err) => setError(extractErrorMessage(err, 'Không thể tải danh sách người dùng')))
+      .finally(() => setLoading(false))
+  }, [])
+
   const filtered = useMemo(() => {
-    return systemUsers.filter(
+    return users.filter(
       (u) =>
         u.fullName.toLowerCase().includes(search.toLowerCase()) ||
         u.email.toLowerCase().includes(search.toLowerCase()),
     )
-  }, [search])
+  }, [users, search])
 
   return (
     <div>
@@ -42,6 +55,7 @@ export default function UsersPage() {
           onSearchChange={setSearch}
           placeholder="Tìm theo họ tên, email..."
         />
+        {error && <p className="table-card__error">{error}</p>}
         <DataTable
           columns={[
             { key: 'name', header: 'Họ tên', render: (u) => u.fullName },
@@ -60,7 +74,7 @@ export default function UsersPage() {
           ]}
           data={filtered}
           getRowId={(u) => u.id}
-          emptyText="Không tìm thấy người dùng phù hợp"
+          emptyText={loading ? 'Đang tải dữ liệu...' : 'Không tìm thấy người dùng phù hợp'}
         />
       </div>
     </div>

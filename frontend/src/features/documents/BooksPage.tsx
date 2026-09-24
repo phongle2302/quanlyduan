@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import PageHeader from '../../components/common/PageHeader'
 import Button from '../../components/common/Button'
 import DataTable from '../../components/common/DataTable'
@@ -6,13 +6,25 @@ import StatusBadge from '../../components/common/StatusBadge'
 import TableToolbar from '../../components/common/TableToolbar'
 import { IconPlus } from '../../components/common/icons'
 import '../../components/common/TableCard.css'
-import { books } from '../../services/mockData'
+import { fetchBooks } from '../../services/booksApi'
+import { extractErrorMessage } from '../../services/api'
 import { bookStatusMap } from '../../constants/statusMaps'
-import type { BookStatus } from '../../types'
+import type { BookRecord, BookStatus } from '../../types'
 
 export default function BooksPage() {
+  const [books, setBooks] = useState<BookRecord[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
   const [search, setSearch] = useState('')
   const [status, setStatus] = useState<BookStatus | 'all'>('all')
+
+  useEffect(() => {
+    setLoading(true)
+    fetchBooks()
+      .then(setBooks)
+      .catch((err) => setError(extractErrorMessage(err, 'Không thể tải danh sách sách')))
+      .finally(() => setLoading(false))
+  }, [])
 
   const filtered = useMemo(() => {
     return books.filter((b) => {
@@ -23,7 +35,7 @@ export default function BooksPage() {
       const matchStatus = status === 'all' || b.status === status
       return matchSearch && matchStatus
     })
-  }, [search, status])
+  }, [books, search, status])
 
   return (
     <div>
@@ -51,6 +63,7 @@ export default function BooksPage() {
             </select>
           }
         />
+        {error && <p className="table-card__error">{error}</p>}
         <DataTable
           columns={[
             { key: 'code', header: 'Mã sách', render: (b) => <strong>{b.code}</strong> },
@@ -71,7 +84,7 @@ export default function BooksPage() {
           ]}
           data={filtered}
           getRowId={(b) => b.id}
-          emptyText="Không tìm thấy sách phù hợp"
+          emptyText={loading ? 'Đang tải dữ liệu...' : 'Không tìm thấy sách phù hợp'}
         />
       </div>
     </div>

@@ -1,5 +1,6 @@
 import { Route, Routes } from 'react-router-dom'
 import MainLayout from '../components/layout/MainLayout'
+import ProtectedRoute from './ProtectedRoute'
 import LoginPage from '../features/auth/LoginPage'
 import DashboardPage from '../features/dashboard/DashboardPage'
 import SupplierContractsPage from '../features/contracts/SupplierContractsPage'
@@ -9,7 +10,11 @@ import BooksPage from '../features/documents/BooksPage'
 import UsersPage from '../features/users/UsersPage'
 
 function withLayout(title: string, element: React.ReactNode) {
-  return <MainLayout title={title}>{element}</MainLayout>
+  return (
+    <ProtectedRoute>
+      <MainLayout title={title}>{element}</MainLayout>
+    </ProtectedRoute>
+  )
 }
 
 export default function AppRoutes() {

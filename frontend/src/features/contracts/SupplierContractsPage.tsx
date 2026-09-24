@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import PageHeader from '../../components/common/PageHeader'
 import Button from '../../components/common/Button'
 import DataTable from '../../components/common/DataTable'
@@ -6,17 +6,29 @@ import StatusBadge from '../../components/common/StatusBadge'
 import TableToolbar from '../../components/common/TableToolbar'
 import { IconPlus } from '../../components/common/icons'
 import '../../components/common/TableCard.css'
-import { supplierContracts } from '../../services/mockData'
+import { fetchContracts } from '../../services/contractsApi'
+import { extractErrorMessage } from '../../services/api'
 import { contractStatusMap } from '../../constants/statusMaps'
 import { formatCurrency, formatDate } from '../../utils/format'
-import type { SupplierContractStatus } from '../../types'
+import type { SupplierContract, SupplierContractStatus } from '../../types'
 
 export default function SupplierContractsPage() {
+  const [contracts, setContracts] = useState<SupplierContract[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
   const [search, setSearch] = useState('')
   const [status, setStatus] = useState<SupplierContractStatus | 'all'>('all')
 
+  useEffect(() => {
+    setLoading(true)
+    fetchContracts()
+      .then(setContracts)
+      .catch((err) => setError(extractErrorMessage(err, 'Không thể tải danh sách hợp đồng')))
+      .finally(() => setLoading(false))
+  }, [])
+
   const filtered = useMemo(() => {
-    return supplierContracts.filter((c) => {
+    return contracts.filter((c) => {
       const matchSearch =
         c.title.toLowerCase().includes(search.toLowerCase()) ||
         c.code.toLowerCase().includes(search.toLowerCase()) ||
@@ -24,7 +36,7 @@ export default function SupplierContractsPage() {
       const matchStatus = status === 'all' || c.status === status
       return matchSearch && matchStatus
     })
-  }, [search, status])
+  }, [contracts, search, status])
 
   return (
     <div>
@@ -53,6 +65,7 @@ export default function SupplierContractsPage() {
             </select>
           }
         />
+        {error && <p className="table-card__error">{error}</p>}
         <DataTable
           columns={[
             { key: 'code', header: 'Mã HĐ', render: (c) => <strong>{c.code}</strong> },
@@ -73,7 +86,7 @@ export default function SupplierContractsPage() {
           ]}
           data={filtered}
           getRowId={(c) => c.id}
-          emptyText="Không tìm thấy hợp đồng phù hợp"
+          emptyText={loading ? 'Đang tải dữ liệu...' : 'Không tìm thấy hợp đồng phù hợp'}
         />
       </div>
     </div>

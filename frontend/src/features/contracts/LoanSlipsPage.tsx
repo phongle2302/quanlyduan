@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import PageHeader from '../../components/common/PageHeader'
 import Button from '../../components/common/Button'
 import DataTable from '../../components/common/DataTable'
@@ -6,25 +6,37 @@ import StatusBadge from '../../components/common/StatusBadge'
 import TableToolbar from '../../components/common/TableToolbar'
 import { IconPlus } from '../../components/common/icons'
 import '../../components/common/TableCard.css'
-import { loanSlips } from '../../services/mockData'
+import { fetchLoans, type LoanSlipWithRelations } from '../../services/loansApi'
+import { extractErrorMessage } from '../../services/api'
 import { loanStatusMap } from '../../constants/statusMaps'
 import { formatDate } from '../../utils/format'
 import type { LoanStatus } from '../../types'
 
 export default function LoanSlipsPage() {
+  const [loans, setLoans] = useState<LoanSlipWithRelations[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
   const [search, setSearch] = useState('')
   const [status, setStatus] = useState<LoanStatus | 'all'>('all')
 
+  useEffect(() => {
+    setLoading(true)
+    fetchLoans()
+      .then(setLoans)
+      .catch((err) => setError(extractErrorMessage(err, 'Không thể tải danh sách phiếu mượn')))
+      .finally(() => setLoading(false))
+  }, [])
+
   const filtered = useMemo(() => {
-    return loanSlips.filter((l) => {
+    return loans.filter((l) => {
       const matchSearch =
-        l.readerName.toLowerCase().includes(search.toLowerCase()) ||
-        l.bookTitle.toLowerCase().includes(search.toLowerCase()) ||
+        l.reader.fullName.toLowerCase().includes(search.toLowerCase()) ||
+        l.book.title.toLowerCase().includes(search.toLowerCase()) ||
         l.code.toLowerCase().includes(search.toLowerCase())
       const matchStatus = status === 'all' || l.status === status
       return matchSearch && matchStatus
     })
-  }, [search, status])
+  }, [loans, search, status])
 
   return (
     <div>
@@ -52,11 +64,12 @@ export default function LoanSlipsPage() {
             </select>
           }
         />
+        {error && <p className="table-card__error">{error}</p>}
         <DataTable
           columns={[
             { key: 'code', header: 'Mã phiếu', render: (l) => <strong>{l.code}</strong> },
-            { key: 'reader', header: 'Độc giả', render: (l) => l.readerName },
-            { key: 'book', header: 'Sách', render: (l) => l.bookTitle },
+            { key: 'reader', header: 'Độc giả', render: (l) => l.reader.fullName },
+            { key: 'book', header: 'Sách', render: (l) => l.book.title },
             { key: 'borrow', header: 'Ngày mượn', render: (l) => formatDate(l.borrowDate) },
             { key: 'due', header: 'Hạn trả', render: (l) => formatDate(l.dueDate) },
             { key: 'return', header: 'Ngày trả', render: (l) => (l.returnDate ? formatDate(l.returnDate) : '—') },
@@ -71,7 +84,7 @@ export default function LoanSlipsPage() {
           ]}
           data={filtered}
           getRowId={(l) => l.id}
-          emptyText="Không tìm thấy phiếu mượn phù hợp"
+          emptyText={loading ? 'Đang tải dữ liệu...' : 'Không tìm thấy phiếu mượn phù hợp'}
         />
       </div>
     </div>

@@ -1,16 +1,31 @@
 import { useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Button from '../../components/common/Button'
+import { login } from '../../services/authApi'
+import { extractErrorMessage } from '../../services/api'
+import { saveSession } from '../../services/session'
 import './LoginPage.css'
 
 export default function LoginPage() {
   const navigate = useNavigate()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
 
-  function handleSubmit(e: FormEvent) {
+  async function handleSubmit(e: FormEvent) {
     e.preventDefault()
-    navigate('/')
+    setError('')
+    setLoading(true)
+    try {
+      const { token, user } = await login(email, password)
+      saveSession(token, user)
+      navigate('/')
+    } catch (err) {
+      setError(extractErrorMessage(err, 'Không thể đăng nhập, vui lòng thử lại'))
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -26,6 +41,8 @@ export default function LoginPage() {
 
         <h1 className="login-card__heading">Đăng nhập</h1>
         <p className="login-card__hint">Đăng nhập bằng tài khoản nhân viên/thủ thư được cấp.</p>
+
+        {error && <p className="login-card__error">{error}</p>}
 
         <label className="login-field">
           <span>Email</span>
@@ -49,8 +66,8 @@ export default function LoginPage() {
           />
         </label>
 
-        <Button type="submit" className="login-card__submit">
-          Đăng nhập
+        <Button type="submit" className="login-card__submit" disabled={loading}>
+          {loading ? 'Đang đăng nhập...' : 'Đăng nhập'}
         </Button>
       </form>
     </div>
