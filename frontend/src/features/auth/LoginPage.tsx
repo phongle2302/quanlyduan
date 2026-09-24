@@ -45,13 +45,13 @@ export default function LoginPage() {
         {error && <p className="login-card__error">{error}</p>}
 
         <label className="login-field">
-          <span>Email</span>
+          <span>Tài khoản</span>
           <input
-            type="email"
+            type="text"
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="ten.nhanvien@thuvien.edu.vn"
+            placeholder="admin hoặc ten.nhanvien@thuvien.edu.vn"
           />
         </label>
 
