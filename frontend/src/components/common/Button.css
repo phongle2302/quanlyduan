@@ -37,3 +37,15 @@
   background: var(--bg-app);
   color: var(--text-primary);
 }
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.btn:disabled:hover {
+  background: transparent;
+}
+.btn--primary:disabled:hover,
+.btn--secondary:disabled:hover {
+  background: inherit;
+}

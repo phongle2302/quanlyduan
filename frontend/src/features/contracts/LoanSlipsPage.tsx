@@ -6,7 +6,14 @@ import StatusBadge from '../../components/common/StatusBadge'
 import TableToolbar from '../../components/common/TableToolbar'
 import { IconPlus } from '../../components/common/icons'
 import '../../components/common/TableCard.css'
-import { fetchLoans, type LoanSlipWithRelations } from '../../services/loansApi'
+import LoanFormModal from './LoanFormModal'
+import {
+  fetchLoans,
+  createLoan,
+  returnLoan,
+  type LoanSlipWithRelations,
+  type CreateLoanPayload,
+} from '../../services/loansApi'
 import { extractErrorMessage } from '../../services/api'
 import { loanStatusMap } from '../../constants/statusMaps'
 import { formatDate } from '../../utils/format'
@@ -18,14 +25,17 @@ export default function LoanSlipsPage() {
   const [error, setError] = useState('')
   const [search, setSearch] = useState('')
   const [status, setStatus] = useState<LoanStatus | 'all'>('all')
+  const [modalOpen, setModalOpen] = useState(false)
 
-  useEffect(() => {
+  function load() {
     setLoading(true)
     fetchLoans()
       .then(setLoans)
       .catch((err) => setError(extractErrorMessage(err, 'Không thể tải danh sách phiếu mượn')))
       .finally(() => setLoading(false))
-  }, [])
+  }
+
+  useEffect(load, [])
 
   const filtered = useMemo(() => {
     return loans.filter((l) => {
@@ -38,13 +48,33 @@ export default function LoanSlipsPage() {
     })
   }, [loans, search, status])
 
+  async function handleCreate(payload: CreateLoanPayload) {
+    try {
+      await createLoan(payload)
+      setModalOpen(false)
+      load()
+    } catch (err) {
+      throw new Error(extractErrorMessage(err, 'Không thể lập phiếu mượn'))
+    }
+  }
+
+  async function handleReturn(l: LoanSlipWithRelations) {
+    if (!confirm(`Xác nhận trả sách "${l.book.title}" của độc giả "${l.reader.fullName}"?`)) return
+    try {
+      await returnLoan(l.id)
+      load()
+    } catch (err) {
+      setError(extractErrorMessage(err, 'Không thể xác nhận trả sách'))
+    }
+  }
+
   return (
     <div>
       <PageHeader
         title="Phiếu mượn / trả"
         description="Theo dõi phiếu mượn sách của độc giả, hạn trả và tình trạng quá hạn."
         action={
-          <Button>
+          <Button onClick={() => setModalOpen(true)}>
             <IconPlus /> Lập phiếu mượn
           </Button>
         }
@@ -81,12 +111,27 @@ export default function LoanSlipsPage() {
                 return <StatusBadge label={s.label} tone={s.tone} />
               },
             },
+            {
+              key: 'actions',
+              header: '',
+              align: 'right',
+              render: (l) =>
+                l.status !== 'returned' ? (
+                  <div className="row-actions">
+                    <Button variant="secondary" onClick={() => handleReturn(l)}>
+                      Trả sách
+                    </Button>
+                  </div>
+                ) : null,
+            },
           ]}
           data={filtered}
           getRowId={(l) => l.id}
           emptyText={loading ? 'Đang tải dữ liệu...' : 'Không tìm thấy phiếu mượn phù hợp'}
         />
       </div>
+
+      {modalOpen && <LoanFormModal onClose={() => setModalOpen(false)} onSubmit={handleCreate} />}
     </div>
   )
 }

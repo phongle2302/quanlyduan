@@ -4,32 +4,40 @@ import Button from '../../components/common/Button'
 import DataTable from '../../components/common/DataTable'
 import StatusBadge from '../../components/common/StatusBadge'
 import TableToolbar from '../../components/common/TableToolbar'
-import { IconPlus } from '../../components/common/icons'
+import { IconEdit, IconPlus, IconTrash } from '../../components/common/icons'
 import '../../components/common/TableCard.css'
-import { fetchReaders } from '../../services/readersApi'
+import ReaderFormModal from './ReaderFormModal'
+import {
+  fetchReaders,
+  createReader,
+  updateReader,
+  deleteReader,
+  type ReaderPayload,
+  type ReaderWithLoanCount,
+} from '../../services/readersApi'
 import { extractErrorMessage } from '../../services/api'
 import { readerStatusMap } from '../../constants/statusMaps'
 import { formatDate } from '../../utils/format'
 import type { Reader, ReaderStatus } from '../../types'
 
-interface ReaderRow extends Reader {
-  _count?: { loans: number }
-}
-
 export default function ReadersPage() {
-  const [readers, setReaders] = useState<ReaderRow[]>([])
+  const [readers, setReaders] = useState<ReaderWithLoanCount[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [search, setSearch] = useState('')
   const [status, setStatus] = useState<ReaderStatus | 'all'>('all')
+  const [modalOpen, setModalOpen] = useState(false)
+  const [editing, setEditing] = useState<Reader | undefined>(undefined)
 
-  useEffect(() => {
+  function load() {
     setLoading(true)
     fetchReaders()
       .then(setReaders)
       .catch((err) => setError(extractErrorMessage(err, 'Không thể tải danh sách độc giả')))
       .finally(() => setLoading(false))
-  }, [])
+  }
+
+  useEffect(load, [])
 
   const filtered = useMemo(() => {
     return readers.filter((r) => {
@@ -42,13 +50,47 @@ export default function ReadersPage() {
     })
   }, [readers, search, status])
 
+  function openCreate() {
+    setEditing(undefined)
+    setModalOpen(true)
+  }
+
+  function openEdit(r: Reader) {
+    setEditing(r)
+    setModalOpen(true)
+  }
+
+  async function handleSubmit(payload: ReaderPayload) {
+    try {
+      if (editing) {
+        await updateReader(editing.id, payload)
+      } else {
+        await createReader(payload)
+      }
+      setModalOpen(false)
+      load()
+    } catch (err) {
+      throw new Error(extractErrorMessage(err, 'Không thể lưu độc giả'))
+    }
+  }
+
+  async function handleDelete(r: Reader) {
+    if (!confirm(`Xóa độc giả "${r.fullName}"?`)) return
+    try {
+      await deleteReader(r.id)
+      load()
+    } catch (err) {
+      setError(extractErrorMessage(err, 'Không thể xóa độc giả'))
+    }
+  }
+
   return (
     <div>
       <PageHeader
         title="Hồ sơ độc giả"
         description="Thông tin đăng ký thẻ, liên hệ và tình trạng mượn sách của độc giả."
         action={
-          <Button>
+          <Button onClick={openCreate}>
             <IconPlus /> Thêm độc giả
           </Button>
         }
@@ -85,12 +127,29 @@ export default function ReadersPage() {
                 return <StatusBadge label={s.label} tone={s.tone} />
               },
             },
+            {
+              key: 'actions',
+              header: '',
+              align: 'right',
+              render: (r) => (
+                <div className="row-actions">
+                  <Button variant="ghost" onClick={() => openEdit(r)} title="Sửa">
+                    <IconEdit />
+                  </Button>
+                  <Button variant="ghost" onClick={() => handleDelete(r)} title="Xóa">
+                    <IconTrash />
+                  </Button>
+                </div>
+              ),
+            },
           ]}
           data={filtered}
           getRowId={(r) => r.id}
           emptyText={loading ? 'Đang tải dữ liệu...' : 'Không tìm thấy độc giả phù hợp'}
         />
       </div>
+
+      {modalOpen && <ReaderFormModal initial={editing} onClose={() => setModalOpen(false)} onSubmit={handleSubmit} />}
     </div>
   )
 }

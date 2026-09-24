@@ -5,6 +5,18 @@ const prisma = new PrismaClient()
 
 async function main() {
   const passwordHash = await bcrypt.hash('123456', 10)
+  const adminPasswordHash = await bcrypt.hash('admin', 10)
+
+  await prisma.systemUser.upsert({
+    where: { email: 'admin' },
+    update: { passwordHash: adminPasswordHash, role: 'admin', active: true },
+    create: {
+      fullName: 'Quản trị viên',
+      email: 'admin',
+      passwordHash: adminPasswordHash,
+      role: 'admin',
+    },
+  })
 
   await prisma.systemUser.upsert({
     where: { email: 'hoa.pham@thuvien.edu.vn' },

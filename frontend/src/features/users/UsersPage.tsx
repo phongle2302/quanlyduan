@@ -4,10 +4,19 @@ import Button from '../../components/common/Button'
 import DataTable from '../../components/common/DataTable'
 import StatusBadge from '../../components/common/StatusBadge'
 import TableToolbar from '../../components/common/TableToolbar'
-import { IconPlus } from '../../components/common/icons'
+import { IconEdit, IconPlus, IconTrash } from '../../components/common/icons'
 import '../../components/common/TableCard.css'
-import { fetchUsers } from '../../services/usersApi'
+import UserFormModal from './UserFormModal'
+import {
+  fetchUsers,
+  createUser,
+  updateUser,
+  deleteUser,
+  type CreateUserPayload,
+  type UpdateUserPayload,
+} from '../../services/usersApi'
 import { extractErrorMessage } from '../../services/api'
+import { getCurrentUser } from '../../services/session'
 import type { SystemUser } from '../../types'
 
 const roleLabel: Record<string, string> = {
@@ -20,14 +29,19 @@ export default function UsersPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [search, setSearch] = useState('')
+  const [modalOpen, setModalOpen] = useState(false)
+  const [editing, setEditing] = useState<SystemUser | undefined>(undefined)
+  const currentUser = getCurrentUser()
 
-  useEffect(() => {
+  function load() {
     setLoading(true)
     fetchUsers()
       .then(setUsers)
       .catch((err) => setError(extractErrorMessage(err, 'Không thể tải danh sách người dùng')))
       .finally(() => setLoading(false))
-  }, [])
+  }
+
+  useEffect(load, [])
 
   const filtered = useMemo(() => {
     return users.filter(
@@ -37,13 +51,47 @@ export default function UsersPage() {
     )
   }, [users, search])
 
+  function openCreate() {
+    setEditing(undefined)
+    setModalOpen(true)
+  }
+
+  function openEdit(u: SystemUser) {
+    setEditing(u)
+    setModalOpen(true)
+  }
+
+  async function handleSubmit(payload: CreateUserPayload | UpdateUserPayload) {
+    try {
+      if (editing) {
+        await updateUser(editing.id, payload as UpdateUserPayload)
+      } else {
+        await createUser(payload as CreateUserPayload)
+      }
+      setModalOpen(false)
+      load()
+    } catch (err) {
+      throw new Error(extractErrorMessage(err, 'Không thể lưu người dùng'))
+    }
+  }
+
+  async function handleDelete(u: SystemUser) {
+    if (!confirm(`Xóa người dùng "${u.fullName}"?`)) return
+    try {
+      await deleteUser(u.id)
+      load()
+    } catch (err) {
+      setError(extractErrorMessage(err, 'Không thể xóa người dùng'))
+    }
+  }
+
   return (
     <div>
       <PageHeader
         title="Người dùng hệ thống"
         description="Quản lý tài khoản nhân viên/thủ thư và phân quyền truy cập hệ thống."
         action={
-          <Button>
+          <Button onClick={openCreate}>
             <IconPlus /> Thêm người dùng
           </Button>
         }
@@ -71,12 +119,34 @@ export default function UsersPage() {
                   <StatusBadge label="Đã khóa" tone="neutral" />
                 ),
             },
+            {
+              key: 'actions',
+              header: '',
+              align: 'right',
+              render: (u) => (
+                <div className="row-actions">
+                  <Button variant="ghost" onClick={() => openEdit(u)} title="Sửa">
+                    <IconEdit />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    onClick={() => handleDelete(u)}
+                    title="Xóa"
+                    disabled={u.id === currentUser?.id}
+                  >
+                    <IconTrash />
+                  </Button>
+                </div>
+              ),
+            },
           ]}
           data={filtered}
           getRowId={(u) => u.id}
           emptyText={loading ? 'Đang tải dữ liệu...' : 'Không tìm thấy người dùng phù hợp'}
         />
       </div>
+
+      {modalOpen && <UserFormModal initial={editing} onClose={() => setModalOpen(false)} onSubmit={handleSubmit} />}
     </div>
   )
 }

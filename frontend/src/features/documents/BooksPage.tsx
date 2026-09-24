@@ -4,9 +4,16 @@ import Button from '../../components/common/Button'
 import DataTable from '../../components/common/DataTable'
 import StatusBadge from '../../components/common/StatusBadge'
 import TableToolbar from '../../components/common/TableToolbar'
-import { IconPlus } from '../../components/common/icons'
+import { IconEdit, IconPlus, IconTrash } from '../../components/common/icons'
 import '../../components/common/TableCard.css'
-import { fetchBooks } from '../../services/booksApi'
+import BookFormModal from './BookFormModal'
+import {
+  fetchBooks,
+  createBook,
+  updateBook,
+  deleteBook,
+  type BookPayload,
+} from '../../services/booksApi'
 import { extractErrorMessage } from '../../services/api'
 import { bookStatusMap } from '../../constants/statusMaps'
 import type { BookRecord, BookStatus } from '../../types'
@@ -17,14 +24,18 @@ export default function BooksPage() {
   const [error, setError] = useState('')
   const [search, setSearch] = useState('')
   const [status, setStatus] = useState<BookStatus | 'all'>('all')
+  const [modalOpen, setModalOpen] = useState(false)
+  const [editing, setEditing] = useState<BookRecord | undefined>(undefined)
 
-  useEffect(() => {
+  function load() {
     setLoading(true)
     fetchBooks()
       .then(setBooks)
       .catch((err) => setError(extractErrorMessage(err, 'Không thể tải danh sách sách')))
       .finally(() => setLoading(false))
-  }, [])
+  }
+
+  useEffect(load, [])
 
   const filtered = useMemo(() => {
     return books.filter((b) => {
@@ -37,13 +48,47 @@ export default function BooksPage() {
     })
   }, [books, search, status])
 
+  function openCreate() {
+    setEditing(undefined)
+    setModalOpen(true)
+  }
+
+  function openEdit(b: BookRecord) {
+    setEditing(b)
+    setModalOpen(true)
+  }
+
+  async function handleSubmit(payload: BookPayload) {
+    try {
+      if (editing) {
+        await updateBook(editing.id, payload)
+      } else {
+        await createBook(payload)
+      }
+      setModalOpen(false)
+      load()
+    } catch (err) {
+      throw new Error(extractErrorMessage(err, 'Không thể lưu sách'))
+    }
+  }
+
+  async function handleDelete(b: BookRecord) {
+    if (!confirm(`Xóa sách "${b.title}"?`)) return
+    try {
+      await deleteBook(b.id)
+      load()
+    } catch (err) {
+      setError(extractErrorMessage(err, 'Không thể xóa sách'))
+    }
+  }
+
   return (
     <div>
       <PageHeader
         title="Hồ sơ sách / tài liệu"
         description="Danh mục đầu sách, số lượng tồn kho và tình trạng trong thư viện."
         action={
-          <Button>
+          <Button onClick={openCreate}>
             <IconPlus /> Thêm đầu sách
           </Button>
         }
@@ -81,12 +126,29 @@ export default function BooksPage() {
                 return <StatusBadge label={s.label} tone={s.tone} />
               },
             },
+            {
+              key: 'actions',
+              header: '',
+              align: 'right',
+              render: (b) => (
+                <div className="row-actions">
+                  <Button variant="ghost" onClick={() => openEdit(b)} title="Sửa">
+                    <IconEdit />
+                  </Button>
+                  <Button variant="ghost" onClick={() => handleDelete(b)} title="Xóa">
+                    <IconTrash />
+                  </Button>
+                </div>
+              ),
+            },
           ]}
           data={filtered}
           getRowId={(b) => b.id}
           emptyText={loading ? 'Đang tải dữ liệu...' : 'Không tìm thấy sách phù hợp'}
         />
       </div>
+
+      {modalOpen && <BookFormModal initial={editing} onClose={() => setModalOpen(false)} onSubmit={handleSubmit} />}
     </div>
   )
 }

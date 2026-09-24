@@ -4,9 +4,16 @@ import Button from '../../components/common/Button'
 import DataTable from '../../components/common/DataTable'
 import StatusBadge from '../../components/common/StatusBadge'
 import TableToolbar from '../../components/common/TableToolbar'
-import { IconPlus } from '../../components/common/icons'
+import { IconEdit, IconPlus, IconTrash } from '../../components/common/icons'
 import '../../components/common/TableCard.css'
-import { fetchContracts } from '../../services/contractsApi'
+import ContractFormModal from './ContractFormModal'
+import {
+  fetchContracts,
+  createContract,
+  updateContract,
+  deleteContract,
+  type ContractPayload,
+} from '../../services/contractsApi'
 import { extractErrorMessage } from '../../services/api'
 import { contractStatusMap } from '../../constants/statusMaps'
 import { formatCurrency, formatDate } from '../../utils/format'
@@ -18,14 +25,18 @@ export default function SupplierContractsPage() {
   const [error, setError] = useState('')
   const [search, setSearch] = useState('')
   const [status, setStatus] = useState<SupplierContractStatus | 'all'>('all')
+  const [modalOpen, setModalOpen] = useState(false)
+  const [editing, setEditing] = useState<SupplierContract | undefined>(undefined)
 
-  useEffect(() => {
+  function load() {
     setLoading(true)
     fetchContracts()
       .then(setContracts)
       .catch((err) => setError(extractErrorMessage(err, 'Không thể tải danh sách hợp đồng')))
       .finally(() => setLoading(false))
-  }, [])
+  }
+
+  useEffect(load, [])
 
   const filtered = useMemo(() => {
     return contracts.filter((c) => {
@@ -38,13 +49,47 @@ export default function SupplierContractsPage() {
     })
   }, [contracts, search, status])
 
+  function openCreate() {
+    setEditing(undefined)
+    setModalOpen(true)
+  }
+
+  function openEdit(c: SupplierContract) {
+    setEditing(c)
+    setModalOpen(true)
+  }
+
+  async function handleSubmit(payload: ContractPayload) {
+    try {
+      if (editing) {
+        await updateContract(editing.id, payload)
+      } else {
+        await createContract(payload)
+      }
+      setModalOpen(false)
+      load()
+    } catch (err) {
+      throw new Error(extractErrorMessage(err, 'Không thể lưu hợp đồng'))
+    }
+  }
+
+  async function handleDelete(c: SupplierContract) {
+    if (!confirm(`Xóa hợp đồng "${c.title}"?`)) return
+    try {
+      await deleteContract(c.id)
+      load()
+    } catch (err) {
+      setError(extractErrorMessage(err, 'Không thể xóa hợp đồng'))
+    }
+  }
+
   return (
     <div>
       <PageHeader
         title="Hợp đồng nhà cung cấp"
         description="Quản lý hợp đồng mua sách, thiết bị, dịch vụ ký với nhà cung cấp/nhà xuất bản."
         action={
-          <Button>
+          <Button onClick={openCreate}>
             <IconPlus /> Thêm hợp đồng
           </Button>
         }
@@ -83,12 +128,31 @@ export default function SupplierContractsPage() {
                 return <StatusBadge label={s.label} tone={s.tone} />
               },
             },
+            {
+              key: 'actions',
+              header: '',
+              align: 'right',
+              render: (c) => (
+                <div className="row-actions">
+                  <Button variant="ghost" onClick={() => openEdit(c)} title="Sửa">
+                    <IconEdit />
+                  </Button>
+                  <Button variant="ghost" onClick={() => handleDelete(c)} title="Xóa">
+                    <IconTrash />
+                  </Button>
+                </div>
+              ),
+            },
           ]}
           data={filtered}
           getRowId={(c) => c.id}
           emptyText={loading ? 'Đang tải dữ liệu...' : 'Không tìm thấy hợp đồng phù hợp'}
         />
       </div>
+
+      {modalOpen && (
+        <ContractFormModal initial={editing} onClose={() => setModalOpen(false)} onSubmit={handleSubmit} />
+      )}
     </div>
   )
 }

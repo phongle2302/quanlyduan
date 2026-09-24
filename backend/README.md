@@ -39,7 +39,10 @@ npm run prisma:seed       # tạo dữ liệu mẫu + tài khoản đăng nhập
 npm run dev                # chạy server tại http://localhost:4000
 ```
 
-Tài khoản mẫu sau khi seed: `hoa.pham@thuvien.edu.vn` / `123456` (role admin).
+Tài khoản sau khi seed:
+- `admin` / `admin` — quản trị viên, toàn quyền (dùng để đăng nhập nhanh khi test).
+- `hoa.pham@thuvien.edu.vn` / `123456` — quản trị viên mẫu.
+- `long.nguyen@thuvien.edu.vn` / `123456` — thủ thư mẫu (không có quyền quản lý người dùng, không xóa được hợp đồng/độc giả/sách).
 
 ## Quy ước
 
